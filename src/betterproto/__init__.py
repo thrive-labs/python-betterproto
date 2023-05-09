@@ -862,7 +862,8 @@ class Message(ABC):
         return bytes(self)
 
     def __setstate__(self, pickled_bytes):
-        return self.parse(pickled_bytes)
+        restored = type(self)().parse(pickled_bytes)
+        self.__dict__.update(restored.__dict__)
 
     @classmethod
     def _type_hint(cls, field_name: str) -> Type:

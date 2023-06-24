@@ -727,6 +727,15 @@ class Message(ABC):
             for field_name in self._betterproto.meta_by_field_name
         )
 
+    def __copy__(self: T) -> T:
+        kwargs = {}
+        for name in self._betterproto.sorted_field_names:
+            value = self.__raw_get(name)
+            if value is not PLACEHOLDER:
+                kwargs[name] = value
+        return self.__class__(**kwargs)  # type: ignore
+
+
     def __deepcopy__(self: T, _: Any = {}) -> T:
         kwargs = {}
         for name in self._betterproto.sorted_field_names:
@@ -858,11 +867,8 @@ class Message(ABC):
         """
         return bytes(self)
 
-    def __getstate__(self):
-        return bytes(self)
-
-    def __setstate__(self, pickled_bytes):
-        return self.parse(pickled_bytes)
+    # pickle support
+    __getstate__ = __bytes__
 
     @classmethod
     def _type_hint(cls, field_name: str) -> Type:
@@ -1049,6 +1055,9 @@ class Message(ABC):
             The initialized message.
         """
         return cls().parse(data)
+
+    # pickle support
+    __setstate__ = parse
 
     def to_dict(
         self, casing: Casing = Casing.CAMEL, include_default_values: bool = False

@@ -11,10 +11,7 @@ from base64 import (
     b64decode,
     b64encode,
 )
-from copy import (
-    copy,
-    deepcopy,
-)
+from copy import deepcopy
 from datetime import (
     datetime,
     timedelta,
@@ -735,7 +732,7 @@ class Message(ABC):
         for name in self._betterproto.sorted_field_names:
             value = self.__raw_get(name)
             if value is not PLACEHOLDER:
-                kwargs[name] = copy(value)
+                kwargs[name] = value
         return self.__class__(**kwargs)  # type: ignore
 
 
